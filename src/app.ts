@@ -1,4 +1,4 @@
-import { Renderer } from './renderer/renderer';
+import Renderer from './renderer/renderer';
 
 export class App {
   private _renderer: Renderer;
