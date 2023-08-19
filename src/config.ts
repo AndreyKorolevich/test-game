@@ -19,6 +19,8 @@ export const config = {
     speed: 10,
     previousPosition: 0,
     isSpinning: false,
+    additionalRightOffset: 20,
+    height: 469
   },
 
   crank: {

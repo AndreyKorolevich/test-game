@@ -38,15 +38,38 @@ class SlotMachine {
       [SLOT_MACHINE_STATE.LOST]: new LostState(this),
     }
     this._currentState = this._states[SLOT_MACHINE_STATE.NO_BALANCE]
-    for (let i = 0; i < this._countReels; i++) {
-      const reel = new Reel(app, i)
-      this._reels.push(reel)
-      this.container.addChild(reel.container)
-    }
+
     this._crank = new Crank(app, this.turnCrank.bind(this))
     this._scoreboard = new Scoreboard(app, this)
 
-    this.container.addChild(this._crank.container, this._scoreboard.container)
+    this._initializeSlotMachine(app)
+  }
+
+  private _initializeSlotMachine(app: PIXI.Application): void {
+    const reelsContainer = new PIXI.Container()
+
+    //set up offset of the reels
+    reelsContainer.x = config.sideColumn.width + config.reel.additionalRightOffset
+    reelsContainer.width = config.reel.width * config.slotMachine.countReels
+    reelsContainer.height = config.reel.height
+
+    // Create a mask shape
+    const maskShape = new PIXI.Graphics()
+    maskShape.beginFill(0xFF3300)
+    maskShape.drawRect(reelsContainer.x, 0, config.reel.width * config.slotMachine.countReels, config.reel.height)
+    maskShape.endFill()
+
+    // Apply the mask to the reelsContainer
+    reelsContainer.mask = maskShape
+
+    for (let i = 0; i < this._countReels; i++) {
+      const reel = new Reel(app, i)
+      this._reels.push(reel)
+      reelsContainer.addChild(reel.container)
+    }
+
+
+    this.container.addChild(reelsContainer, this._crank.container, this._scoreboard.container)
   }
 
   public setState(state: SLOT_MACHINE_STATE): void {
@@ -82,7 +105,7 @@ class SlotMachine {
   }
 
   public turnCrank(): void {
-  this._crank.onDisable()
+    this._crank.onDisable()
   }
 
   public addBalanceAfterWin(): void {
