@@ -43,8 +43,10 @@ class SlotMachine {
       this._reels.push(reel)
       this.container.addChild(reel.container)
     }
-    this._crank = new Crank(app, this.turnCrank)
+    this._crank = new Crank(app, this.turnCrank.bind(this))
     this._scoreboard = new Scoreboard(app, this)
+
+    this.container.addChild(this._crank.container, this._scoreboard.container)
   }
 
   public setState(state: SLOT_MACHINE_STATE): void {
@@ -80,7 +82,7 @@ class SlotMachine {
   }
 
   public turnCrank(): void {
-
+  this._crank.onDisable()
   }
 
   public addBalanceAfterWin(): void {

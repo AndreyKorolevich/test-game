@@ -7,7 +7,7 @@ class Reel {
   private _ticker: PIXI.Ticker
   private _position: number
   private _sprites: Array<PIXI.Sprite> = []
-  private _blur: PIXI.filters.BlurFilter = new PIXI.filters.BlurFilter()
+  private _blur: PIXI.Filter = new PIXI.filters.BlurFilter()
   private _width: number = config.reel.width
   private _countRows: number  = config.reel.countRows
   private _scale: number  = config.reel.scale
@@ -19,10 +19,14 @@ class Reel {
     this._ticker = app.ticker
     this._position = position
     this._cells = [
-      app.loader.resources.assets.textures!['Slot1.png'],
-      app.loader.resources.assets.textures!['Slot2.png'],
-      app.loader.resources.assets.textures!['Slot3.png'],
-      app.loader.resources.assets.textures!['Slot4.png'],
+      app.loader.resources.asset.textures!['cell1.png'],
+      app.loader.resources.asset.textures!['cell2.png'],
+      app.loader.resources.asset.textures!['cell3.png'],
+      app.loader.resources.asset.textures!['cell4.png'],
+      app.loader.resources.asset.textures!['cell5.png'],
+      app.loader.resources.asset.textures!['cell6.png'],
+      app.loader.resources.asset.textures!['cell7.png'],
+      app.loader.resources.asset.textures!['cell8.png'],
     ]
   }
 

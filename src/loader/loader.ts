@@ -12,14 +12,14 @@ class Loader {
     this.isLoading = true
     loadingScreen.show()
     this._onLoadData()
-    this._loader.load(this._endLoading(loadingScreen, handlerEndLoading))
+    this._loader.load(this._onDataLoaded(loadingScreen, handlerEndLoading))
   }
 
   private _onLoadData(): void {
-    this._loader.add('assets', './assets/asset.json')
+    this._loader.add('asset', 'asset.json')
   }
 
-  private _endLoading(loadingScreen: Screen, handlerEndLoading: () => void) {
+  private _onDataLoaded(loadingScreen: Screen, handlerEndLoading: () => void) {
     return () => {
       loadingScreen.hide()
       handlerEndLoading()

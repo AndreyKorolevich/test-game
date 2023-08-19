@@ -5,6 +5,7 @@ import Loader from '../loader/loader'
 import WinScreen from '../screen/win-screen'
 import LostScreen from '../screen/lost-screen'
 import LoadingScreen from '../screen/loading-screen'
+import { config } from '../config'
 
 class Renderer {
   private readonly _application: PIXI.Application
@@ -17,20 +18,21 @@ class Renderer {
 
   public constructor() {
     this._application = new PIXI.Application({
-      backgroundColor: 0x000000,
-      autoStart: true,
+      height: config.render.height + config.crank.bcgHeight,
+      width: config.reel.width * config.slotMachine.countReels + (config.sideColumn.width * 2),
+      backgroundAlpha: 0,
     })
 
     document.body.appendChild(this._application.view)
 
     this._loadingScreen = new LoadingScreen(this._application)
-    this._loader = new Loader(this._application,  this._loadingScreen, this._start)
+    this._loader = new Loader(this._application,  this._loadingScreen, this._start.bind(this))
   }
 
   private _start(): void {
     this._initializeScreens()
-    this._initializeSlotMachine()
     this._initializeBackground()
+    this._initializeSlotMachine()
   }
 
   private _initializeScreens(): void {
@@ -49,7 +51,7 @@ class Renderer {
 
   private _initializeBackground(): void {
     this._background = new Background(this._application)
-    this._application.stage.addChild(this._background.sprite)
+    this._application.stage.addChild(this._background.container)
   }
 }
 
