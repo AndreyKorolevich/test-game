@@ -10,12 +10,12 @@ export enum SLOT_MACHINE_STATE {
 }
 
 export abstract class MachineState {
-  private _state: SLOT_MACHINE_STATE
+  public state: SLOT_MACHINE_STATE
   private _slotMachine: SlotMachine
 
   protected constructor(slotMachine: SlotMachine, state: SLOT_MACHINE_STATE) {
     this._slotMachine = slotMachine
-    this._state = state
+    this.state = state
   }
 
   public abstract resetBalance(): void

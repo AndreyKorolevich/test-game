@@ -17,11 +17,8 @@ class Scoreboard {
   }
 
   private _initializeSprite(appWidth: number, appHeight: number): void {
-    const style = new PIXI.TextStyle({
-      fontFamily: config.text.fontFamily,
-      fill: config.text.color,
-      fontSize: config.text.fontSize,
-    })
+    const textStyle = config.text.textStyle as PIXI.TextStyle
+    const style = new PIXI.TextStyle(textStyle)
 
 
     this._balanceText = new PIXI.Text(`Balance: ${this._balance}$`, style)

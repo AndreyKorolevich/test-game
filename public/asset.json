@@ -12,132 +12,132 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 108,
-        "h": 101
+        "w": 92,
+        "h": 95
       },
       "sourceSize": {
-        "w": 108,
-        "h": 101
+        "w": 92,
+        "h": 95
       }
     },
     "cell2.png": {
       "frame": {
         "x": 212,
         "y": 1,
-        "w": 128,
-        "h": 114
+        "w": 92,
+        "h": 95
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 128,
-        "h": 114
+        "w": 92,
+        "h": 95
       },
       "sourceSize": {
-        "w": 128,
-        "h": 114
+        "w": 92,
+        "h": 95
       }
     },
     "cell3.png": {
       "frame": {
         "x": 212,
         "y": 222,
-        "w": 112,
-        "h": 102
+        "w": 92,
+        "h": 95
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 112,
-        "h": 102
+        "w": 92,
+        "h": 95
       },
       "sourceSize": {
-        "w": 112,
-        "h": 102
+        "w": 92,
+        "h": 95
       }
     },
     "cell4.png": {
       "frame": {
         "x": 327,
         "y": 126,
-        "w": 112,
-        "h": 106
+        "w": 92,
+        "h": 95
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 112,
-        "h": 106
+        "w": 92,
+        "h": 95
       },
       "sourceSize": {
-        "w": 112,
-        "h": 106
+        "w": 92,
+        "h": 95
       }
     },
     "cell5.png": {
       "frame": {
         "x": 212,
         "y": 117,
-        "w": 113,
-        "h": 103
+        "w": 92,
+        "h": 95
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 113,
-        "h": 103
+        "w": 92,
+        "h": 95
       },
       "sourceSize": {
-        "w": 113,
-        "h": 103
+        "w": 92,
+        "h": 95
       }
     },
     "cell6.png": {
       "frame": {
         "x": 212,
         "y": 326,
-        "w": 106,
-        "h": 106
+        "w": 92,
+        "h": 95
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 106,
-        "h": 106
+        "w": 92,
+        "h": 95
       },
       "sourceSize": {
-        "w": 106,
-        "h": 106
+        "w": 92,
+        "h": 95
       }
     },
     "cell7.png": {
       "frame": {
         "x": 320,
         "y": 337,
-        "w": 103,
-        "h": 105
+        "w": 92,
+        "h": 95
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 103,
-        "h": 105
+        "w": 92,
+        "h": 95
       },
       "sourceSize": {
-        "w": 103,
-        "h": 105
+        "w": 92,
+        "h": 95
       }
     },
     "cell8.png": {

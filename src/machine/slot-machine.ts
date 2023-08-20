@@ -3,11 +3,12 @@ import { config } from '../config'
 import Reel from './reel'
 import {
   HasBalanceState,
-  HasBetState, LostState,
+  HasBetState,
+  LostState,
+  MachineState,
   NoBalanceState,
   SLOT_MACHINE_STATE,
   SpinReelsState,
-  MachineState,
   WinState,
 } from './slot-mashine-state/slot-mashine-state'
 import Crank from './crank'
@@ -37,7 +38,7 @@ class SlotMachine {
       [SLOT_MACHINE_STATE.WIN]: new WinState(this),
       [SLOT_MACHINE_STATE.LOST]: new LostState(this),
     }
-    this._currentState = this._states[SLOT_MACHINE_STATE.NO_BALANCE]
+    this._currentState = this._states[SLOT_MACHINE_STATE.HAS_BALANCE]
 
     this._crank = new Crank(app, this.turnCrank.bind(this))
     this._scoreboard = new Scoreboard(app, this)
@@ -68,7 +69,6 @@ class SlotMachine {
       reelsContainer.addChild(reel.container)
     }
 
-
     this.container.addChild(reelsContainer, this._crank.container, this._scoreboard.container)
   }
 
@@ -76,11 +76,51 @@ class SlotMachine {
     this._currentState = this._states[state]
   }
 
-  public spin(): void {
+  public async spin(): Promise<void> {
+    if (this._currentState.state !== SLOT_MACHINE_STATE.HAS_BALANCE) return
+    this.setState(SLOT_MACHINE_STATE.SPIN_REELS)
 
+    const start = Date.now()
+    const remainingReels = [...this._reels]
+
+    for await (let value of this._spinLoop(remainingReels)) {
+      const offset = config.slotMachine.startDelay + (this._reels.length - remainingReels.length + 1) * config.slotMachine.reelDelay
+
+      if (Date.now() >= start + offset) {
+        remainingReels[0].resetBlur()
+        remainingReels.shift()
+      }
+
+      if (!remainingReels.length) break
+    }
+
+    this._reelsComplete(this._reels.map(reel => reel.sprites[2]))
   }
 
-  private _winChecker(): boolean {
+  private async* _spinLoop(remainingReels: Array<Reel>) {
+    while (true) {
+      const spinningReels = remainingReels.map(reel => reel.spin())
+      await Promise.all(spinningReels)
+      this._exchangeTexture()
+      yield
+    }
+  }
+
+  private _exchangeTexture() {
+    this._reels.forEach(reel => {
+      reel.sprites[0].texture = reel.cells[Math.floor(Math.random() * reel.cells.length)]
+    })
+  }
+
+  private _reelsComplete(cells: Array<PIXI.Sprite>): void {
+    if (this._winChecker(cells)) {
+      this.setState(SLOT_MACHINE_STATE.WIN)
+    } else {
+      this.setState(SLOT_MACHINE_STATE.LOST)
+    }
+  }
+
+  private _winChecker(cells: Array<PIXI.Sprite>): boolean {
     return false
   }
 
@@ -104,8 +144,11 @@ class SlotMachine {
 
   }
 
-  public turnCrank(): void {
+  public async turnCrank(): Promise<void> {
     this._crank.onDisable()
+    await this.spin()
+    this._crank.offDisable()
+
   }
 
   public addBalanceAfterWin(): void {

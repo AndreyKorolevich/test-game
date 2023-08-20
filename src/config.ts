@@ -1,3 +1,5 @@
+import * as PIXI from 'pixi.js';
+
 export const config = {
   render: {
     height: 469,
@@ -11,16 +13,18 @@ export const config = {
     minCountReels: 3,
     balance: 500,
     bet: 10,
+    startDelay: 700,
+    reelDelay: 350,
   },
   reel: {
     width: 145,
     countRows: 3,
     scale: 1,
-    speed: 10,
+    speed: 20,
     previousPosition: 0,
     isSpinning: false,
     additionalRightOffset: 20,
-    height: 469
+    height: 469,
   },
 
   crank: {
@@ -31,12 +35,25 @@ export const config = {
   },
 
   text: {
-    fontFamily: 'Times New Roman',
-    color: 'green',
-    fontSize: 30,
+    textStyle: {
+      fontFamily: 'Arial',
+      fontSize: 30,
+      fontStyle: 'italic',
+      fontWeight: 'bold',
+      fill: ['#ffffff', '#00ff99'], // gradient
+      stroke: '#4a1850',
+      strokeThickness: 5,
+      dropShadow: true,
+      dropShadowColor: '#000000',
+      dropShadowBlur: 4,
+      dropShadowAngle: Math.PI / 6,
+      dropShadowDistance: 6,
+      wordWrap: true,
+      wordWrapWidth: 440,
+    },
     bcg: 0xffc107,
-    bcgWidth: 200
-  }
+    bcgWidth: 250,
+  },
 
 
 }
