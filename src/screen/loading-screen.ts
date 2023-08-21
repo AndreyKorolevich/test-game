@@ -1,10 +1,9 @@
 import * as PIXI from 'pixi.js'
-import { config } from '../config'
 import Screen from './screen'
 
 class LoadingScreen extends Screen {
-  public constructor(app: PIXI.Application) {
-    super(app)
+  public constructor(app: PIXI.Application, onClickHandler: () => void) {
+    super(app, onClickHandler)
   }
 
   initializeScreen(): void {

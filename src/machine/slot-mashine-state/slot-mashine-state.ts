@@ -1,4 +1,5 @@
 import SlotMachine from '../slot-machine'
+import { config } from '../../config'
 
 export enum SLOT_MACHINE_STATE {
   NO_BALANCE = 'NO_BALANCE',
@@ -11,20 +12,26 @@ export enum SLOT_MACHINE_STATE {
 
 export abstract class MachineState {
   public state: SLOT_MACHINE_STATE
-  private _slotMachine: SlotMachine
+  public slotMachine: SlotMachine
 
   protected constructor(slotMachine: SlotMachine, state: SLOT_MACHINE_STATE) {
-    this._slotMachine = slotMachine
+    this.slotMachine = slotMachine
     this.state = state
   }
 
-  public abstract resetBalance(): void
+  public abstract spin(): void
+
+  public abstract cashOutBalance(): void
 
   public abstract placeBet(): void
 
+  public abstract reduceBet(): void
+
   public abstract turnCrank(): void
 
-  public abstract addBalanceAfterWin(): void
+  public abstract showScreen(): void
+
+  public abstract hideScreen(): void
 
   public abstract addBalance(): void
 
@@ -38,19 +45,37 @@ export class NoBalanceState extends MachineState {
     super(slotMachine, SLOT_MACHINE_STATE.NO_BALANCE)
   }
 
-  public resetBalance(): void {
-  }
-
-  public placeBet(): void {
-  }
-
-  public turnCrank(): void {
-  }
-
-  public addBalanceAfterWin(): void {
+  public spin(): void {
+    console.log('Add balance and place bet first')
   }
 
   public addBalance(): void {
+    this.slotMachine.setState(SLOT_MACHINE_STATE.HAS_BALANCE)
+    this.slotMachine.incBalance()
+  }
+
+  public cashOutBalance(): void {
+    console.log('You do not have money in your wallet')
+  }
+
+  public placeBet(): void {
+    console.log('Add balance first please')
+  }
+
+  public reduceBet(): void {
+    console.log('Add balance and place bet first please')
+  }
+
+  public turnCrank(): void {
+    console.log('Add balance first please')
+  }
+
+  public showScreen(): void {
+    console.log('Opps there is no screen for NoBalanceState')
+  }
+
+  public hideScreen(): void {
+    console.log('Nothing to hide')
   }
 
   public dispenseWin(): void {
@@ -65,19 +90,43 @@ export class HasBalanceState extends MachineState {
     super(slotMachine, SLOT_MACHINE_STATE.HAS_BALANCE)
   }
 
-  public resetBalance(): void {
+  public spin(): void {
+    console.log('Place bet first')
   }
 
-  public placeBet(): void {
-  }
-
-  public turnCrank(): void {
-  }
-
-  public addBalanceAfterWin(): void {
+  public cashOutBalance(): void {
+    this.slotMachine.decBalance()
+    this.slotMachine.setState(SLOT_MACHINE_STATE.NO_BALANCE)
   }
 
   public addBalance(): void {
+    this.slotMachine.incBalance()
+  }
+
+  public placeBet(): void {
+    this.slotMachine.incBet()
+
+    if (this.slotMachine.getBet() < 0) {
+      console.log('Your balance is too small')
+      return
+    }
+    this.slotMachine.setState(SLOT_MACHINE_STATE.HAS_BET)
+  }
+
+  public reduceBet(): void {
+    console.log('Place bet first please')
+  }
+
+  public turnCrank(): void {
+    console.log('Place bet first please')
+  }
+
+  public showScreen(): void {
+    console.log('Opps there is no screen for HasBalanceState')
+  }
+
+  public hideScreen(): void {
+    console.log('Nothing to hide')
   }
 
   public dispenseWin(): void {
@@ -92,19 +141,43 @@ export class HasBetState extends MachineState {
     super(slotMachine, SLOT_MACHINE_STATE.HAS_BET)
   }
 
-  public resetBalance(): void {
+  public spin(): void {
+    console.log('Turn crank to spin reels')
+  }
+
+  public cashOutBalance(): void {
+    this.slotMachine.decBalance()
   }
 
   public placeBet(): void {
+    this.slotMachine.incBet()
+  }
+
+  public reduceBet(): void {
+    this.slotMachine.decBet()
+    if (this.slotMachine.getBet() <= 0 && this.slotMachine.getBalance() > 0) {
+      this.slotMachine.setState(SLOT_MACHINE_STATE.HAS_BALANCE)
+    } else if (this.slotMachine.getBet() <= 0 && this.slotMachine.getBet() <= 0) {
+      this.slotMachine.setState(SLOT_MACHINE_STATE.NO_BALANCE)
+    }
   }
 
   public turnCrank(): void {
+    this.slotMachine.crank.onDisable()
+    this.slotMachine.setState(SLOT_MACHINE_STATE.SPIN_REELS)
+    this.slotMachine.spin()
   }
 
-  public addBalanceAfterWin(): void {
+  public showScreen(): void {
+    console.log('Opps there is no screen for HasBetState')
+  }
+
+  public hideScreen(): void {
+    console.log('Nothing to hide')
   }
 
   public addBalance(): void {
+    this.slotMachine.incBalance()
   }
 
   public dispenseWin(): void {
@@ -119,19 +192,36 @@ export class WinState extends MachineState {
     super(slotMachine, SLOT_MACHINE_STATE.WIN)
   }
 
-  public resetBalance(): void {
+  public spin(): void {
+    console.log('Place bet first please!')
+  }
+
+  public cashOutBalance(): void {
+    console.log('Just wait before win screen is closed')
   }
 
   public placeBet(): void {
+    console.log('Just wait before win screen is closed')
+  }
+
+  public reduceBet(): void {
+    console.log('Place bet first please!')
   }
 
   public turnCrank(): void {
+    console.log('Place bet first please')
   }
 
-  public addBalanceAfterWin(): void {
+  public showScreen(): void {
+    this.slotMachine.showWinScreen()
+  }
+
+  public hideScreen(): void {
+    this.slotMachine.setState(SLOT_MACHINE_STATE.HAS_BALANCE)
   }
 
   public addBalance(): void {
+    console.log('Just wait before win screen is closed')
   }
 
   public dispenseWin(): void {
@@ -146,19 +236,41 @@ export class LostState extends MachineState {
     super(slotMachine, SLOT_MACHINE_STATE.LOST)
   }
 
-  public resetBalance(): void {
+  public spin(): void {
+    console.log('Place bet first please!')
+  }
+
+  public cashOutBalance(): void {
+    console.log('Just wait before lost screen is closed')
   }
 
   public placeBet(): void {
+    console.log('Just wait before lost screen is closed')
+  }
+
+  public reduceBet(): void {
+    console.log('Place bet first please!')
   }
 
   public turnCrank(): void {
+    console.log('Place bet first please')
   }
 
-  public addBalanceAfterWin(): void {
+  public showScreen(): void {
+    this.slotMachine.showLostScreen()
+  }
+
+  public hideScreen(): void {
+    if (this.slotMachine.getBalance() > 0) {
+      this.slotMachine.setState(SLOT_MACHINE_STATE.HAS_BALANCE)
+    } else {
+      this.slotMachine.setState(SLOT_MACHINE_STATE.NO_BALANCE)
+    }
+
   }
 
   public addBalance(): void {
+    console.log('Just wait before lost screen is closed')
   }
 
   public dispenseWin(): void {
@@ -173,19 +285,60 @@ export class SpinReelsState extends MachineState {
     super(slotMachine, SLOT_MACHINE_STATE.SPIN_REELS)
   }
 
-  public resetBalance(): void {
+  public async spin(): Promise<void> {
+    const start = Date.now()
+    const remainingReels = [...this.slotMachine.reels]
+
+    for await (let value of this.slotMachine.spinLoop(remainingReels)) {
+      const offset = config.slotMachine.startDelay + (this.slotMachine.reels.length - remainingReels.length + 1) * config.slotMachine.reelDelay
+
+      if (Date.now() >= start + offset) {
+        remainingReels[0].resetBlur()
+        remainingReels.shift()
+      }
+
+      if (!remainingReels.length) break
+    }
+
+    this.slotMachine.crank.offDisable()
+
+    if (this.slotMachine.winChecker(this.slotMachine.reels)) {
+      this.slotMachine.setState(SLOT_MACHINE_STATE.WIN)
+      this.slotMachine.addBalanceAfterWin()
+    } else {
+      this.slotMachine.setState(SLOT_MACHINE_STATE.LOST)
+    }
+
+    this.slotMachine.showScreen()
+    this.slotMachine.resetBet()
+  }
+
+  public cashOutBalance(): void {
+    console.log('Just wait before reels are stopped')
   }
 
   public placeBet(): void {
+    console.log('Just wait before reels are stopped')
+  }
+
+  public reduceBet(): void {
+    console.log('Just wait before reels are stopped')
   }
 
   public turnCrank(): void {
+    console.log('Reels have already spinning')
   }
 
-  public addBalanceAfterWin(): void {
+  public showScreen(): void {
+    console.log('There is no screen for SpinReelsState')
+  }
+
+  public hideScreen(): void {
+    console.log('Nothing to hide')
   }
 
   public addBalance(): void {
+    console.log('Just wait before reels are stopped')
   }
 
   public dispenseWin(): void {

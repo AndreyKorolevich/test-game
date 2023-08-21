@@ -1,5 +1,3 @@
-import * as PIXI from 'pixi.js';
-
 export const config = {
   render: {
     height: 469,
@@ -11,7 +9,7 @@ export const config = {
     countReels: 5,
     maxCountReels: 7,
     minCountReels: 3,
-    balance: 500,
+    balance: 100,
     bet: 10,
     startDelay: 700,
     reelDelay: 350,
@@ -50,6 +48,11 @@ export const config = {
       dropShadowDistance: 6,
       wordWrap: true,
       wordWrapWidth: 440,
+    },
+    actionTextStyle: {
+      stroke: '#b03151',
+      fontSize: 18,
+      dropShadow: false
     },
     bcg: 0xffc107,
     bcgWidth: 250,
