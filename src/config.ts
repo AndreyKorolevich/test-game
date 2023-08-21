@@ -1,9 +1,9 @@
 export const config = {
   render: {
-    height: 469,
+    height: 339,
   },
   sideColumn: {
-    width: 60,
+    width: 48,
   },
   slotMachine: {
     countReels: 5,
@@ -12,24 +12,28 @@ export const config = {
     balance: 100,
     bet: 10,
     startDelay: 700,
-    reelDelay: 350,
   },
   reel: {
-    width: 145,
+    width: 118,
     countRows: 3,
-    scale: 1,
-    speed: 20,
+    scale: {
+      x: 1.2
+    },
     previousPosition: 0,
     isSpinning: false,
-    additionalRightOffset: 20,
-    height: 469,
+    additionalRightOffset: 15,
+    height: 339,
   },
 
   crank: {
-    width: 90,
-    height: 91,
-    bcgWidth: 121,
-    bcgHeight: 123,
+    width: 99,
+    height: 98,
+    bcgWidth: 130,
+    bcgHeight: 132,
+  },
+
+  cell: {
+    width: 113,
   },
 
   text: {

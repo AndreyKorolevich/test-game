@@ -32,6 +32,7 @@ class SlotMachine {
     [key in SLOT_MACHINE_STATE]: MachineState
   }
   private _currentState: MachineState
+  private _tweening: Array<any> = []
 
   public constructor(app: PIXI.Application) {
     this._states = {
@@ -57,13 +58,13 @@ class SlotMachine {
 
     //set up offset of the reels
     reelsContainer.x = config.sideColumn.width + config.reel.additionalRightOffset
-    reelsContainer.width = config.reel.width * config.slotMachine.countReels
+    reelsContainer.width = config.reel.width * config.slotMachine.countReels * config.reel.scale.x
     reelsContainer.height = config.reel.height
 
     // Create a mask shape
     const maskShape = new PIXI.Graphics()
     maskShape.beginFill(0xFF3300)
-    maskShape.drawRect(reelsContainer.x, 0, config.reel.width * config.slotMachine.countReels, config.reel.height)
+    maskShape.drawRect(reelsContainer.x, 0, config.reel.width * config.slotMachine.countReels * config.reel.scale.x, config.reel.height)
     maskShape.endFill()
 
     // Apply the mask to the reelsContainer
@@ -81,8 +82,41 @@ class SlotMachine {
     this.container.addChild(this._lostScreen.container)
     this.container.addChild(this._winScreen.container)
 
+    this._addTicker(app.ticker)
+
     // @ts-ignore
     window.state = this._currentState
+  }
+
+  private _addTicker(ticker: PIXI.Ticker): void {
+    // Listen for animate update.
+    ticker.add((delta) => {
+      const now = Date.now()
+      const remove = []
+
+      for (let i = 0; i < this._tweening.length; i++) {
+        const t = this._tweening[i]
+        const phase = Math.min(1, (now - t.start) / t.time)
+
+        t.reel.spin(t.propertyBeginValue, t.target, t.easing(phase))
+
+        if (phase === 1) {
+          t.reel.position = t.target
+          // wait before the last reel is stopped
+          if (i === this._tweening.length - 1) {
+            // add short delay to be shore that all other reels are stopped as well
+            setTimeout(() => {
+              this._completeSpin()
+            }, 200)
+
+          }
+          remove.push(t)
+        }
+      }
+      for (let i = 0; i < remove.length; i++) {
+        this._tweening.splice(this._tweening.indexOf(remove[i]), 1)
+      }
+    })
   }
 
   public setState(state: SLOT_MACHINE_STATE): void {
@@ -95,22 +129,21 @@ class SlotMachine {
     this._currentState.spin()
   }
 
-  public async* spinLoop(remainingReels: Array<Reel>) {
-    while (true) {
-      const spinningReels = remainingReels.map(reel => reel.spin())
-      await Promise.all(spinningReels)
-      this._exchangeTexture()
-      yield
+  private _completeSpin() {
+    this.crank.offDisable()
+
+    if (this._winChecker(this.reels)) {
+      this.setState(SLOT_MACHINE_STATE.WIN)
+      this._addBalanceAfterWin()
+    } else {
+      this.setState(SLOT_MACHINE_STATE.LOST)
     }
+
+    this._showScreen()
+    this._resetBet()
   }
 
-  private _exchangeTexture() {
-    this.reels.forEach(reel => {
-      reel.sprites[0].texture = reel.cells[Math.floor(Math.random() * reel.cells.length)]
-    })
-  }
-
-  public winChecker(reels: Array<Reel>): boolean {
+  private _winChecker(reels: Array<Reel>): boolean {
     const combinations: Map<any, Set<any>> = new Map()
 
     for (let i = 0; i < config.reel.countRows; i++) {
@@ -125,8 +158,8 @@ class SlotMachine {
 
     })
 
-    for(const [combName, combSet] of combinations){
-      if(combSet.size >= 1 ) return true
+    for (const [combName, combSet] of combinations) {
+      if (combSet.size === 1) return true
     }
 
     return false
@@ -154,7 +187,7 @@ class SlotMachine {
     this._currentState.turnCrank()
   }
 
-  public showScreen(): void {
+  private _showScreen(): void {
     this._currentState.showScreen()
   }
 
@@ -196,7 +229,7 @@ class SlotMachine {
     this._scoreboard.setBalance(this._balance)
   }
 
-  public resetBet(): void {
+  private _resetBet(): void {
     this._bet = 0
     this._scoreboard.setBet(this._bet)
   }
@@ -209,11 +242,30 @@ class SlotMachine {
     this._lostScreen?.show()
   }
 
+  private _backout(amount: number) {
+    return (t: number) => (--t * t * ((amount + 1) * t + amount) + 1)
+  }
+
+  public tweenTo(reel: Reel, target: number, time: number) {
+    const tween = {
+      reel,
+      propertyBeginValue: reel.position,
+      target,
+      easing: this._backout(0.5),
+      time,
+      start: Date.now(),
+    }
+
+    this._tweening.push(tween)
+
+    return tween
+  }
+
   private _addReel(): void {
 
   }
 
-  public addBalanceAfterWin(): void {
+  private _addBalanceAfterWin(): void {
     this._balance += this._bet * 3
     this._scoreboard.setBalance(this._balance)
   }

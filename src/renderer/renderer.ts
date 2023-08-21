@@ -15,7 +15,7 @@ class Renderer {
   public constructor() {
     this._application = new PIXI.Application({
       height: config.render.height + config.crank.bcgHeight,
-      width: config.reel.width * config.slotMachine.countReels + (config.sideColumn.width * 2),
+      width: config.reel.width * config.slotMachine.countReels * config.reel.scale.x + (config.sideColumn.width * 2),
       backgroundAlpha: 0,
     })
 

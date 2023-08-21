@@ -1,5 +1,4 @@
 import SlotMachine from '../slot-machine'
-import { config } from '../../config'
 
 export enum SLOT_MACHINE_STATE {
   NO_BALANCE = 'NO_BALANCE',
@@ -286,31 +285,14 @@ export class SpinReelsState extends MachineState {
   }
 
   public async spin(): Promise<void> {
-    const start = Date.now()
-    const remainingReels = [...this.slotMachine.reels]
+    for (let i = 0; i < this.slotMachine.reels.length; i++) {
+      const reel = this.slotMachine.reels[i]
+      const extra = Math.floor(Math.random() * 3)
+      const target = reel.position + 10 + i * 5 + extra
+      const time = 2000 + i * 500 + extra * 500
 
-    for await (let value of this.slotMachine.spinLoop(remainingReels)) {
-      const offset = config.slotMachine.startDelay + (this.slotMachine.reels.length - remainingReels.length + 1) * config.slotMachine.reelDelay
-
-      if (Date.now() >= start + offset) {
-        remainingReels[0].resetBlur()
-        remainingReels.shift()
-      }
-
-      if (!remainingReels.length) break
+      this.slotMachine.tweenTo(reel, target, time)
     }
-
-    this.slotMachine.crank.offDisable()
-
-    if (this.slotMachine.winChecker(this.slotMachine.reels)) {
-      this.slotMachine.setState(SLOT_MACHINE_STATE.WIN)
-      this.slotMachine.addBalanceAfterWin()
-    } else {
-      this.slotMachine.setState(SLOT_MACHINE_STATE.LOST)
-    }
-
-    this.slotMachine.showScreen()
-    this.slotMachine.resetBet()
   }
 
   public cashOutBalance(): void {

@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js'
-import { config } from '../config'
 import Screen from '../screen/screen'
 
 
@@ -16,7 +15,7 @@ class Loader {
   }
 
   private _onLoadData(): void {
-    this._loader.add('asset', 'asset.json')
+    this._loader.add('asset', 'asset1.json')
   }
 
   private _onDataLoaded(loadingScreen: Screen, handlerEndLoading: () => void) {

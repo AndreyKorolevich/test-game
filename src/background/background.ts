@@ -27,9 +27,10 @@ class Background {
 
     // fill the background with reels
     for(let i = 0; i < config.slotMachine.countReels; i++){
-      const reelColumn = new PIXI.Sprite(this._reelTexture)
-      reelColumn.x = leftColumn.width + i * reelColumn.width
-      this.container.addChild(reelColumn)
+      const reel = new PIXI.Sprite(this._reelTexture)
+      reel.x = leftColumn.width + i * reel.width * config.reel.scale.x
+      reel.scale.x = config.reel.scale.x
+        this.container.addChild(reel)
     }
   }
 }
