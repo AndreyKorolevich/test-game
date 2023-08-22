@@ -1,5 +1,4 @@
 import SlotMachine from '../slot-machine'
-import { config } from '../../config'
 
 export enum SLOT_MACHINE_STATE {
   NO_BALANCE = 'NO_BALANCE',
@@ -286,11 +285,12 @@ export class SpinReelsState extends MachineState {
   }
 
   public async spin(): Promise<void> {
+    const config = this.slotMachine.config
     for (let i = 0; i < this.slotMachine.reels.length; i++) {
       const reel = this.slotMachine.reels[i]
       const extra = Math.floor(Math.random() * config.reel.countRows)
       const target = reel.position + config.spin.startOffset + i * config.slotMachine.countReels + extra
-      const time = config.spin.firstDelay + i * config.spin.reelDela + extra * config.spin.reelDela
+      const time = config.spin.firstDelay + i * config.spin.reelDelay + extra * config.spin.reelDelay
 
       this.slotMachine.tweenTo(reel, target, time)
     }

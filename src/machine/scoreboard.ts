@@ -34,11 +34,11 @@ class Scoreboard {
     this._balanceText = new PIXI.Text(`Balance: ${this._slotMachine.getBalance()}$`, style)
 
     this._balanceText.y = yPosition + this._balanceText.height / 2
-    this._balanceText.x = appWidth / 4 - this._balanceText.width / 2
+    this._balanceText.x = 0
 
     this._addBalanceText = new PIXI.Text('Top up', new PIXI.TextStyle(actionStyle))
     this._addBalanceText.y = yPosition
-    this._addBalanceText.x = appWidth / 4 - this._addBalanceText.width / 2
+    this._addBalanceText.x = config.text.bcgWidth / 2 - this._addBalanceText.width / 2
 
     this._addBalanceText.interactive = true
     this._addBalanceText.buttonMode = true
@@ -46,7 +46,7 @@ class Scoreboard {
 
     this._cashedText = new PIXI.Text('Cash out', new PIXI.TextStyle(actionStyle))
     this._cashedText.y = yPosition + this._cashedText.height * 2 + 10
-    this._cashedText.x = appWidth / 4 - this._cashedText.width / 2
+    this._cashedText.x = config.text.bcgWidth / 2 - this._cashedText.width / 2
 
     this._cashedText.interactive = true
     this._cashedText.buttonMode = true
@@ -55,7 +55,7 @@ class Scoreboard {
     const balanceBcg = new PIXI.Graphics()
     balanceBcg.beginFill(config.text.bcg)
     const balanceBcgHeight = this._balanceText.height * 2
-    balanceBcg.drawRoundedRect(appWidth / 4 - config.text.bcgWidth / 2, yPosition, config.text.bcgWidth, balanceBcgHeight, 10)
+    balanceBcg.drawRoundedRect(0, yPosition, config.text.bcgWidth, balanceBcgHeight, 10)
     balanceBcg.endFill()
     balanceBcg.addChild(this._balanceText, this._addBalanceText, this._cashedText)
 
@@ -65,11 +65,11 @@ class Scoreboard {
   private _initializeBetBoard(appWidth: number, style: PIXI.TextStyle, actionStyle: PIXI.TextStyle, yPosition: number): PIXI.Graphics {
     this._betText = new PIXI.Text(`Bet: ${this._slotMachine.getBet()}$`, style)
     this._betText.y = yPosition + this._betText.height / 2
-    this._betText.x = appWidth * 0.75 - this._betText.width / 2
+    this._betText.x = appWidth  - config.text.bcgWidth / 2 - this._betText.width / 2
 
     this._placeBetText = new PIXI.Text('+', new PIXI.TextStyle(actionStyle))
     this._placeBetText.y = yPosition
-    this._placeBetText.x = appWidth * 0.75 - this._placeBetText.width / 2
+    this._placeBetText.x = appWidth - config.text.bcgWidth / 2 - this._placeBetText.width / 2
 
     this._placeBetText.interactive = true
     this._placeBetText.buttonMode = true
@@ -77,7 +77,7 @@ class Scoreboard {
 
     this._decreaseBetText = new PIXI.Text('-', new PIXI.TextStyle(actionStyle))
     this._decreaseBetText.y = yPosition + this._decreaseBetText.height * 2 + 10
-    this._decreaseBetText.x = appWidth * 0.75 - this._decreaseBetText.width / 2
+    this._decreaseBetText.x = appWidth - config.text.bcgWidth / 2 - this._decreaseBetText.width / 2
 
     this._decreaseBetText.interactive = true
     this._decreaseBetText.buttonMode = true
@@ -86,7 +86,7 @@ class Scoreboard {
     const betBcg = new PIXI.Graphics()
     betBcg.beginFill(config.text.bcg)
     const betBcgHeight = this._betText.height * 2
-    betBcg.drawRoundedRect(appWidth * 0.75 - config.text.bcgWidth / 2, yPosition, config.text.bcgWidth, betBcgHeight, 10)
+    betBcg.drawRoundedRect(appWidth - config.text.bcgWidth, yPosition, config.text.bcgWidth, betBcgHeight, 10)
     betBcg.endFill()
     betBcg.addChild(this._betText, this._placeBetText, this._decreaseBetText)
 

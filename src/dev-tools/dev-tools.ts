@@ -5,7 +5,11 @@ class DevTools {
   private readonly _topCenterSelect: HTMLSelectElement
   private readonly _centerSelect: HTMLSelectElement
   private readonly _bottomSelect: HTMLSelectElement
+  private readonly _reelSelect: HTMLSelectElement
+  private readonly _rowSelect: HTMLSelectElement
   private readonly _options: Array<string> = ['cell1', 'cell2', 'cell3', 'cell4', 'cell5', 'cell6', 'cell7', 'cell8', 'random']
+  private readonly _reelOptions: Array<string> = ['three', 'four', 'five', 'six', 'seven']
+  private readonly _rowOptions: Array<string> = ['three', 'four']
 
   private _selectedOptions: Record<string, number> = {}
 
@@ -15,6 +19,7 @@ class DevTools {
     this._container.style.left = '50%'
     this._container.style.top = '10%'
     this._container.style.transform = 'translate(-50%, -50%)'
+    this._container.style.maxWidth = '100%'
     appContainer.appendChild(this._container)
 
     this._selectContainer = document.createElement('div')
@@ -22,16 +27,22 @@ class DevTools {
     this._selectContainer.style.flexDirection = 'row'
     this._selectContainer.style.alignItems = 'center'
     this._selectContainer.style.gap = '20px'
-    this._selectContainer.style.padding = '20px'
+    this._selectContainer.style.padding = '10px'
     this._selectContainer.style.backgroundColor = '#cddc39'
+    this._selectContainer.style.overflowX = 'auto'
+
 
     this._topCenterSelect = this._createSelect(this._options)
     this._centerSelect = this._createSelect(this._options)
     this._bottomSelect = this._createSelect(this._options)
+    this._reelSelect = this._createSelect(this._reelOptions)
+    this._rowSelect = this._createSelect(this._rowOptions)
 
     this._addSelectableGroup('Top', this._topCenterSelect)
     this._addSelectableGroup('Center', this._centerSelect)
     this._addSelectableGroup('Bottom', this._bottomSelect)
+    this._addSelectableGroup('Reel', this._reelSelect)
+    this._addSelectableGroup('Row', this._rowSelect)
 
     this._selectContainer.appendChild(this._createSendButton(callback))
 
@@ -41,6 +52,8 @@ class DevTools {
     this._topCenterSelect.addEventListener('change', this._handleSelectChange.bind(this, 'top'))
     this._centerSelect.addEventListener('change', this._handleSelectChange.bind(this, 'center'))
     this._bottomSelect.addEventListener('change', this._handleSelectChange.bind(this, 'bottom'))
+    this._reelSelect.addEventListener('change', this._handleSelectChange.bind(this, 'reel'))
+    this._rowSelect.addEventListener('change', this._handleSelectChange.bind(this, 'row'))
   }
 
   private _addSelectableGroup(label: string, select: HTMLSelectElement): void {
@@ -74,9 +87,11 @@ class DevTools {
 
   private _handleSelectChange(groupName: string, event: Event): void {
     const select = event.target as HTMLSelectElement
-    const selectedOption = Number(select.value)
+    let selectedOption = Number(select.value)
+    if(groupName === 'reel' || groupName === 'row'){
+      selectedOption += 3
+    }
     this._selectedOptions[groupName] = selectedOption
-    console.log(`Selected option for ${groupName}: ${selectedOption}`)
   }
 
   private _createSendButton(callback: (options: Record<string, number>) => void): HTMLButtonElement {

@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js'
-import { config } from '../config'
 
 class Crank {
   public container: PIXI.Container = new PIXI.Container()

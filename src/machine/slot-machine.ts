@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js'
-import { config } from '../config'
 import Reel from './reel'
 import {
   HasBalanceState,
@@ -21,11 +20,9 @@ class SlotMachine {
   public reels: Array<Reel> = []
   public crank: Crank
   private _scoreboard: Scoreboard
-  private _balance: number = 0
-  private _bet: number = 0
-  private _countReels: number = config.slotMachine.countReels
-  private _maxCountReels: number = config.slotMachine.maxCountReels
-  private _minCountReels: number = config.slotMachine.minCountReels
+  private _balance: number = 100
+  private _bet: number = 10
+  private readonly _countReels: number
   private _winScreen: WinScreen
   private _lostScreen: LostScreen
   private readonly _states: {
@@ -41,7 +38,10 @@ class SlotMachine {
     start: number,
   }> = []
 
-  public constructor(app: PIXI.Application, settings: { [key: string]: number }) {
+  public readonly config: { [key: string]: any }
+
+  public constructor(app: PIXI.Application, config: { [key: string]: any }) {
+    this.config = config
     this._states = {
       [SLOT_MACHINE_STATE.NO_BALANCE]: new NoBalanceState(this),
       [SLOT_MACHINE_STATE.HAS_BALANCE]: new HasBalanceState(this),
@@ -50,35 +50,40 @@ class SlotMachine {
       [SLOT_MACHINE_STATE.WIN]: new WinState(this),
       [SLOT_MACHINE_STATE.LOST]: new LostState(this),
     }
-    this._currentState = this._states[SLOT_MACHINE_STATE.NO_BALANCE]
+    this._currentState = this._states[SLOT_MACHINE_STATE.HAS_BET]
 
     this.crank = new Crank(app, this.turnCrank.bind(this))
     this._scoreboard = new Scoreboard(app, this)
     this._lostScreen = new LostScreen(app, this.hideScreen.bind(this))
     this._winScreen = new WinScreen(app, this.hideScreen.bind(this))
 
-    this._initializeSlotMachine(app, settings)
+    this._countReels = config.slotMachine.countReels
+
+
+    this._initializeSlotMachine(app)
   }
 
-  private _initializeSlotMachine(app: PIXI.Application, settings: { [key: string]: number }): void {
+  private _initializeSlotMachine(app: PIXI.Application): void {
     const reelsContainer = new PIXI.Container()
 
     //set up offset of the reels
-    reelsContainer.x = config.sideColumn.width + config.reel.additionalRightOffset
-    reelsContainer.width = config.reel.width * config.slotMachine.countReels * config.reel.scale.x
-    reelsContainer.height = config.reel.height
+    const containerWidth = this.config.reel.width * this.config.slotMachine.countReels * this.config.reel.scale.x
+    const containerHeight = this.config.cell.width * this.config.reel.countRows
+    reelsContainer.x = this.config.sideColumn.width + this.config.reel.additionalRightOffset
+    reelsContainer.width = containerWidth
+    reelsContainer.height = containerHeight
 
     // Create a mask shape
     const maskShape = new PIXI.Graphics()
     maskShape.beginFill(0xFF3300)
-    maskShape.drawRect(reelsContainer.x, 0, config.reel.width * config.slotMachine.countReels * config.reel.scale.x, config.reel.height)
+    maskShape.drawRect(reelsContainer.x, 0, containerWidth, containerHeight)
     maskShape.endFill()
 
     // Apply the mask to the reelsContainer
     reelsContainer.mask = maskShape
 
     for (let i = 0; i < this._countReels; i++) {
-      const reel = new Reel(app, i, settings, this.getTargets.bind(this), this.isSpinning.bind(this))
+      const reel = new Reel(app, i, this.config, this.getTargets.bind(this))
       this.reels.push(reel)
       reelsContainer.addChild(reel.container)
     }
@@ -112,7 +117,7 @@ class SlotMachine {
           if (i === this._tweening.length - 1) {
             // add short delay to be shore that all other reels are stopped as well
             // setTimeout(() => {
-              this._completeSpin()
+            this._completeSpin()
             // }, 200)
 
           }
@@ -133,7 +138,6 @@ class SlotMachine {
 
   public spin(): void {
     this._currentState.spin()
-
   }
 
   private _completeSpin() {
@@ -153,12 +157,12 @@ class SlotMachine {
   private _winChecker(): boolean {
     const combinations: Map<string, Set<any>> = new Map()
 
-    for (let i = 0; i < config.reel.countRows; i++) {
+    for (let i = 0; i < this.config.reel.countRows; i++) {
       combinations.set(`comb${i}`, new Set)
     }
 
     this.reels.forEach(reel => {
-      for (let i = 0; i < config.reel.countRows; i++) {
+      for (let i = 0; i < this.config.reel.countRows; i++) {
         const sprite = reel.sprites[i]
         combinations.get(`comb${i}`)!.add(sprite.texture.textureCacheIds[0].split('.')[0])
       }
@@ -212,7 +216,7 @@ class SlotMachine {
   }
 
   public incBalance(): void {
-    this._balance += config.slotMachine.balance
+    this._balance += this.config.slotMachine.balance
     this._scoreboard.setBalance(this._balance)
   }
 
@@ -222,17 +226,17 @@ class SlotMachine {
   }
 
   public incBet(): void {
-    if (this._balance - config.slotMachine.bet < 0) return
+    if (this._balance - this.config.slotMachine.bet < 0) return
 
-    this._bet += config.slotMachine.bet
-    this._balance -= config.slotMachine.bet
+    this._bet += this.config.slotMachine.bet
+    this._balance -= this.config.slotMachine.bet
     this._scoreboard.setBet(this._bet)
     this._scoreboard.setBalance(this._balance)
   }
 
   public decBet(): void {
-    this._bet -= config.slotMachine.bet
-    this._balance += config.slotMachine.bet
+    this._bet -= this.config.slotMachine.bet
+    this._balance += this.config.slotMachine.bet
     this._scoreboard.setBet(this._bet)
     this._scoreboard.setBalance(this._balance)
   }
@@ -271,21 +275,9 @@ class SlotMachine {
     return new Set(this._tweening.map(t => t.target))
   }
 
-  public isSpinning(): boolean {
-    return this._currentState.state === SLOT_MACHINE_STATE.SPIN_REELS
-  }
-
-  private _addReel(): void {
-
-  }
-
   private _addBalanceAfterWin(): void {
     this._balance += this._bet * 3
     this._scoreboard.setBalance(this._balance)
-  }
-
-  public setCountReels(): void {
-
   }
 }
 

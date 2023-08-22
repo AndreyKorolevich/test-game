@@ -59,14 +59,16 @@ export const config = {
       dropShadow: false
     },
     bcg: 0xffc107,
-    bcgWidth: 250,
+    bcgWidth: 200,
   },
 
   spin: {
     firstDelay: 2000,
-    reelDela: 500,
+    reelDelay: 500,
     startOffset: 10
+  },
+
+  dev: {
+
   }
-
-
 }
