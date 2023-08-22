@@ -32,9 +32,16 @@ class SlotMachine {
     [key in SLOT_MACHINE_STATE]: MachineState
   }
   private _currentState: MachineState
-  private _tweening: Array<any> = []
+  private _tweening: Array<{
+    reel: Reel,
+    startPosition: number,
+    target: number,
+    easing: (t: number) => number,
+    time: number,
+    start: number,
+  }> = []
 
-  public constructor(app: PIXI.Application) {
+  public constructor(app: PIXI.Application, settings: { [key: string]: number }) {
     this._states = {
       [SLOT_MACHINE_STATE.NO_BALANCE]: new NoBalanceState(this),
       [SLOT_MACHINE_STATE.HAS_BALANCE]: new HasBalanceState(this),
@@ -50,10 +57,10 @@ class SlotMachine {
     this._lostScreen = new LostScreen(app, this.hideScreen.bind(this))
     this._winScreen = new WinScreen(app, this.hideScreen.bind(this))
 
-    this._initializeSlotMachine(app)
+    this._initializeSlotMachine(app, settings)
   }
 
-  private _initializeSlotMachine(app: PIXI.Application): void {
+  private _initializeSlotMachine(app: PIXI.Application, settings: { [key: string]: number }): void {
     const reelsContainer = new PIXI.Container()
 
     //set up offset of the reels
@@ -71,7 +78,7 @@ class SlotMachine {
     reelsContainer.mask = maskShape
 
     for (let i = 0; i < this._countReels; i++) {
-      const reel = new Reel(app, i)
+      const reel = new Reel(app, i, settings, this.getTargets.bind(this), this.isSpinning.bind(this))
       this.reels.push(reel)
       reelsContainer.addChild(reel.container)
     }
@@ -97,17 +104,17 @@ class SlotMachine {
       for (let i = 0; i < this._tweening.length; i++) {
         const t = this._tweening[i]
         const phase = Math.min(1, (now - t.start) / t.time)
+        t.reel.spin(t.startPosition, t.target, t.easing(phase))
 
-        t.reel.spin(t.propertyBeginValue, t.target, t.easing(phase))
 
         if (phase === 1) {
           t.reel.position = t.target
           // wait before the last reel is stopped
           if (i === this._tweening.length - 1) {
             // add short delay to be shore that all other reels are stopped as well
-            setTimeout(() => {
+            // setTimeout(() => {
               this._completeSpin()
-            }, 200)
+            // }, 200)
 
           }
           remove.push(t)
@@ -127,12 +134,13 @@ class SlotMachine {
 
   public spin(): void {
     this._currentState.spin()
+
   }
 
   private _completeSpin() {
     this.crank.offDisable()
 
-    if (this._winChecker(this.reels)) {
+    if (this._winChecker()) {
       this.setState(SLOT_MACHINE_STATE.WIN)
       this._addBalanceAfterWin()
     } else {
@@ -143,22 +151,23 @@ class SlotMachine {
     this._resetBet()
   }
 
-  private _winChecker(reels: Array<Reel>): boolean {
-    const combinations: Map<any, Set<any>> = new Map()
+  private _winChecker(): boolean {
+    const combinations: Map<string, Set<any>> = new Map()
 
     for (let i = 0; i < config.reel.countRows; i++) {
-      combinations.set(`comb${i}`, new Set())
+      combinations.set(`comb${i}`, new Set)
     }
 
-    reels.forEach(reel => {
+    this.reels.forEach(reel => {
       for (let i = 0; i < config.reel.countRows; i++) {
-        const cell = reel.sprites[i]
-        combinations.get(`comb${i}`)!.add(cell.texture.textureCacheIds[0].split('.')[0])
+        const sprite = reel.sprites[i]
+        combinations.get(`comb${i}`)!.add(sprite.texture.textureCacheIds[0].split('.')[0])
       }
 
     })
 
     for (const [combName, combSet] of combinations) {
+      console.log(combName, combSet)
       if (combSet.size === 1) return true
     }
 
@@ -246,10 +255,10 @@ class SlotMachine {
     return (t: number) => (--t * t * ((amount + 1) * t + amount) + 1)
   }
 
-  public tweenTo(reel: Reel, target: number, time: number) {
+  public tweenTo(reel: Reel, target: number, time: number): void {
     const tween = {
       reel,
-      propertyBeginValue: reel.position,
+      startPosition: reel.position,
       target,
       easing: this._backout(0.5),
       time,
@@ -257,8 +266,14 @@ class SlotMachine {
     }
 
     this._tweening.push(tween)
+  }
 
-    return tween
+  public getTargets(): Set<number> {
+    return new Set(this._tweening.map(t => t.target))
+  }
+
+  public isSpinning(): boolean {
+    return this._currentState.state === SLOT_MACHINE_STATE.SPIN_REELS
   }
 
   private _addReel(): void {

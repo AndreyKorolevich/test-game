@@ -11,10 +11,22 @@ class Reel {
   public blur = new PIXI.filters.BlurFilter()
   private _width: number = config.reel.width
   private _countRows: number = config.reel.countRows
+  private readonly _getTargets: () => Set<number>
+  private readonly _isSpinning: () => boolean
+  private _settings: { [key: string]: number }
 
-  public constructor(app: PIXI.Application, position: number) {
+  public constructor(
+    app: PIXI.Application,
+    position: number,
+    settings: { [key: string]: number },
+    getTargets: () => Set<number>,
+    isSpinning: () => boolean,
+  ) {
     this._ticker = app.ticker
     this.position = position
+    this._getTargets = getTargets
+    this._isSpinning = isSpinning
+
     this.cells = [
       app.loader.resources.asset.textures!['cell1.png'],
       app.loader.resources.asset.textures!['cell2.png'],
@@ -27,10 +39,11 @@ class Reel {
     ]
 
     this._initializeReel(position)
+    this._settings = settings
   }
 
-  public spin(propertyBeginValue: number, target: number, easing: number): void {
-    this.position = this._lerp(propertyBeginValue, target, easing)
+  public spin(startPosition: number, target: number, easing: number): void {
+    this.position = this._lerp(startPosition, target, easing)
     this.setBlur()
   }
 
@@ -43,8 +56,6 @@ class Reel {
     for (let i = 0; i < this._countRows + 1; i++) {
       const cell = new PIXI.Sprite(this.cells[Math.floor(Math.random() * this.cells.length)])
       cell.y = i * config.cell.width
-      cell.scale.x = cell.scale.y = Math.min(config.cell.width / cell.width, config.cell.width / cell.height)
-      cell.x = Math.round((config.cell.width - cell.width) / 2)
 
       this.sprites.push(cell)
       this.container.addChild(cell)
@@ -53,37 +64,55 @@ class Reel {
     this._addTicker()
   }
 
-  private _addTicker(): void{
+  private _addTicker(): void {
     this._ticker.add((delta) => {
       // Update the slots.
       this._previousPosition = this.position
+      const targetPositions = this._getTargets()
+
+      // if (!this._isSpinning()) return
 
       // Update symbol positions on reel.
       for (let j = 0; j < this.sprites.length; j++) {
-        const s = this.sprites[j]
-        const prevy = s.y
+        const sprite = this.sprites[j]
+        const prevy = sprite.y
 
-        s.y = ((this.position + j) % this.sprites.length) * config.cell.width - config.cell.width
-        if (s.y < 0 && prevy > config.cell.width) {
-          // Detect going over and swap a texture.
-          s.texture = this.cells[Math.floor(Math.random() * this.cells.length)]
-          s.scale.x = s.scale.y = Math.min(config.cell.width / s.texture.width, config.cell.width / s.texture.height)
-          s.x = Math.round((config.cell.width - s.width) / 2)
+        sprite.y = ((this.position + j) % this.sprites.length) * config.cell.width - config.cell.width // TODO
+
+        if (sprite.y < 0 && prevy > config.cell.width) {
+          // Detect going over and swap a texture
+
+          //first 3 "if" use for test purposes
+          if (this._shouldSetTexture( this._settings.top, 1, targetPositions)){
+            sprite.texture = this.cells[this._settings.top]
+          } else if (this._shouldSetTexture( this._settings.center, 2, targetPositions)) {
+            sprite.texture = this.cells[this._settings.center]
+          } else if (this._shouldSetTexture( this._settings.bottom, 3, targetPositions)) {
+            sprite.texture = this.cells[this._settings.bottom]
+          } else {
+            // regular swap texture
+            sprite.texture = this.cells[Math.floor(Math.random() * this.cells.length)]
+          }
+
         }
       }
     })
   }
 
-  public resetBlur(): void {
-    this.blur.blurY = 0
+  private _shouldSetTexture(settingsValue: number | undefined, offset: number, targetPositions: Set<number>): boolean {
+    return (
+      settingsValue !== undefined &&
+      settingsValue < this.cells.length - 1 &&
+      targetPositions.has(Math.floor(this.position) + offset)
+    );
   }
 
   public setBlur(): void {
-    this.blur.blurY = (this.position - this._previousPosition) * 16;
+    this.blur.blurY = (this.position - this._previousPosition) * 16
   }
 
-  private _lerp(a1: number, a2: number, t: number) {
-    return a1 * (1 - t) + a2 * t
+  private _lerp(startPosition: number, target: number, easing: number) {
+    return startPosition * (1 - easing) + target * easing
   }
 
 }
