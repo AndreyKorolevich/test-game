@@ -4,7 +4,7 @@ import Background from '../background/background'
 import Loader from '../loader/loader'
 import LoadingScreen from '../screen/loading-screen'
 import { config } from '../config'
-import DevTools from '../machine/dev-tools/dev-tools'
+import DevTools from '../dev-tools/dev-tools'
 
 class Renderer {
   private readonly _application: PIXI.Application
@@ -15,10 +15,13 @@ class Renderer {
   private _devTools: DevTools
 
   public constructor() {
+
     this._application = new PIXI.Application({
       height: config.render.height + config.crank.bcgHeight,
       width: config.reel.width * config.slotMachine.countReels * config.reel.scale.x + (config.sideColumn.width * 2),
       backgroundAlpha: 0,
+      // @ts-ignore
+      view: document.getElementById("game")
     })
 
     document.body.appendChild(this._application.view)

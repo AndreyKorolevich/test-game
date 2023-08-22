@@ -33,14 +33,14 @@ class DevTools {
     this._addSelectableGroup('Center', this._centerSelect)
     this._addSelectableGroup('Bottom', this._bottomSelect)
 
-    this._selectContainer.appendChild(this.createSendButton(callback))
+    this._selectContainer.appendChild(this._createSendButton(callback))
 
     this._container.appendChild(this._selectContainer)
 
     // Attach event listeners to the select elements
-    this._topCenterSelect.addEventListener('change', this.handleSelectChange.bind(this, 'top'))
-    this._centerSelect.addEventListener('change', this.handleSelectChange.bind(this, 'center'))
-    this._bottomSelect.addEventListener('change', this.handleSelectChange.bind(this, 'bottom'))
+    this._topCenterSelect.addEventListener('change', this._handleSelectChange.bind(this, 'top'))
+    this._centerSelect.addEventListener('change', this._handleSelectChange.bind(this, 'center'))
+    this._bottomSelect.addEventListener('change', this._handleSelectChange.bind(this, 'bottom'))
   }
 
   private _addSelectableGroup(label: string, select: HTMLSelectElement): void {
@@ -72,14 +72,14 @@ class DevTools {
     return select
   }
 
-  private handleSelectChange(groupName: string, event: Event): void {
+  private _handleSelectChange(groupName: string, event: Event): void {
     const select = event.target as HTMLSelectElement
     const selectedOption = Number(select.value)
     this._selectedOptions[groupName] = selectedOption
     console.log(`Selected option for ${groupName}: ${selectedOption}`)
   }
 
-  private createSendButton(callback: (options: Record<string, number>) => void): HTMLButtonElement {
+  private _createSendButton(callback: (options: Record<string, number>) => void): HTMLButtonElement {
     const sendButton = document.createElement('button')
     sendButton.textContent = 'Save settings'
     sendButton.style.padding = '10px'

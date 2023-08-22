@@ -82,7 +82,7 @@ class Reel {
         if (sprite.y < 0 && prevy > config.cell.width) {
           // Detect going over and swap a texture
 
-          //first 3 "if" use for test purposes
+          // first 3 "if" use for test purposes
           if (this._shouldSetTexture( this._settings.top, 1, targetPositions)){
             sprite.texture = this.cells[this._settings.top]
           } else if (this._shouldSetTexture( this._settings.center, 2, targetPositions)) {
@@ -93,6 +93,7 @@ class Reel {
             // regular swap texture
             sprite.texture = this.cells[Math.floor(Math.random() * this.cells.length)]
           }
+
 
         }
       }

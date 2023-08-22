@@ -62,5 +62,11 @@ export const config = {
     bcgWidth: 250,
   },
 
+  spin: {
+    firstDelay: 2000,
+    reelDela: 500,
+    startOffset: 10
+  }
+
 
 }

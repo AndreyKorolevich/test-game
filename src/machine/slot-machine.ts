@@ -106,7 +106,6 @@ class SlotMachine {
         const phase = Math.min(1, (now - t.start) / t.time)
         t.reel.spin(t.startPosition, t.target, t.easing(phase))
 
-
         if (phase === 1) {
           t.reel.position = t.target
           // wait before the last reel is stopped
