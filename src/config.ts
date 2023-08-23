@@ -40,7 +40,7 @@ export const config = {
   text: {
     textStyle: {
       fontFamily: 'Arial',
-      fontSize: 30,
+      fontSize: 28,
       fontStyle: 'italic',
       fontWeight: 'bold',
       fill: ['#ffffff', '#00ff99'], // gradient

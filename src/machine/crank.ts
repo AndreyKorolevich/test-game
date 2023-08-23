@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js'
+import click from '../assets/audio/slide3.mp3'
 
 class Crank {
   public container: PIXI.Container = new PIXI.Container()
@@ -8,14 +9,17 @@ class Crank {
   private readonly _crank: PIXI.Sprite
   private readonly _bcg: PIXI.Sprite
   private readonly _turnHandler: () => void
+  private readonly _sound: HTMLAudioElement = new Audio()
 
   public constructor(app: PIXI.Application, turnHandler: () => void) {
-    this._upTexture = app.loader.resources!.asset.textures!['crank-abl.png']
-    this._downTexture = app.loader.resources!.asset.textures!['crank-dis.png']
-    this._bcgTexture = app.loader.resources!.asset.textures!['crank-bcg.png']
+    this._upTexture = app.loader.resources.asset.textures!['crank-abl.png']
+    this._downTexture = app.loader.resources.asset.textures!['crank-dis.png']
+    this._bcgTexture = app.loader.resources.asset.textures!['crank-bcg.png']
 
     this._crank = new PIXI.Sprite(this._upTexture)
     this._bcg = new PIXI.Sprite(this._bcgTexture)
+    this._sound.src = click
+    this._sound.volume = 0.5
 
 
     this._turnHandler = turnHandler
@@ -42,6 +46,7 @@ class Crank {
   public onDisable(): void {
     this._crank.interactive = false
     this._crank.texture = this._downTexture
+    this._sound.play()
   }
 
   public offDisable(): void {

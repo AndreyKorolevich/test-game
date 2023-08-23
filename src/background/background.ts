@@ -1,10 +1,12 @@
 import * as PIXI from 'pixi.js'
+import background from '../assets/audio/background.mp3'
 
 class Background {
   public readonly container = new PIXI.Container()
   private readonly _columnTexture: PIXI.Texture
   private readonly _reelTexture: PIXI.Texture
   private _config: { [key: string]: any }
+  public readonly _sound: HTMLAudioElement
 
   public constructor(app: PIXI.Application, config: { [key: string]: any }) {
     this._columnTexture = app.loader.resources.asset.textures!['column.png']
@@ -39,6 +41,11 @@ class Background {
       reel.scale.y = this._config.reel.countRows / 3
       this.container.addChild(reel)
     }
+    this._sound = new Audio()
+    this._sound.src = background
+    this._sound.volume = 0.1
+    this._sound.loop = true
+    this._sound.play()
   }
 }
 

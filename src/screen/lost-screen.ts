@@ -1,9 +1,12 @@
 import * as PIXI from 'pixi.js'
 import Screen from './screen'
+import lost from '../assets/audio/lost.mp3'
 
 class LostScreen extends Screen {
   public constructor(app: PIXI.Application, config: { [key: string]: any }, onClickHandler: () => void) {
     super(app, config, onClickHandler)
+
+    this.sound.src = lost
   }
 
   initializeScreen(appWidth: number, appHeight: number): void {

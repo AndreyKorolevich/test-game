@@ -18,8 +18,8 @@ class Renderer {
     this._devTools = new DevTools(root!, this._saveSettings.bind(this))
 
     this._application = new PIXI.Application({
-      height: config.render.height + config.crank.bcgHeight,
-      width: config.reel.width * config.slotMachine.countReels * config.reel.scale.x + (config.sideColumn.width * 2),
+      height: this._calculateCanvasHeight(),
+      width: this._calculateCanvasWidth(),
       transparent: true,
       view: document.getElementById('game') as HTMLCanvasElement,
     })
@@ -46,12 +46,21 @@ class Renderer {
 
   // resize canvas to fit different screen resolutions
   private _resizeScreen(): void {
-    this._application.view.width = this._config.reel.width * this._config.slotMachine.countReels * this._config.reel.scale.x + (this._config.sideColumn.width * 2)
-    this._application.screen.width = this._config.reel.width * this._config.slotMachine.countReels * this._config.reel.scale.x + (this._config.sideColumn.width * 2)
-    this._application.view.height = this._config.cell.width * this._config.reel.countRows + this._config.crank.bcgHeight
-    this._application.screen.height = this._config.cell.width * this._config.reel.countRows + this._config.crank.bcgHeight
+    this._application.view.width = this._calculateCanvasWidth()
+    this._application.screen.width = this._calculateCanvasWidth()
+    this._application.view.height = this._calculateCanvasHeight()
+    this._application.screen.height = this._calculateCanvasHeight()
   }
 
+  private _calculateCanvasHeight(): number {
+    return this._config.cell.width * this._config.reel.countRows + this._config.crank.bcgHeight
+  }
+
+  private _calculateCanvasWidth(): number {
+    return this._config.reel.width * this._config.slotMachine.countReels * this._config.reel.scale.x + (this._config.sideColumn.width * 2)
+  }
+
+  //applying setting from devTools
   private _saveSettings(settings: { [key: string]: number }): void {
     // Remove existing SlotMachine instance
     if (this._slotMachine) {
@@ -61,6 +70,7 @@ class Renderer {
 
     // Remove existing Background instance
     if (this._background) {
+      this._background._sound.pause()
       this._application.stage.removeChild(this._background.container)
       this._background = undefined
     }
@@ -80,6 +90,7 @@ class Renderer {
         top: settings.top,
         center: settings.center,
         bottom: settings.bottom,
+        move: settings.move
       },
     }
 

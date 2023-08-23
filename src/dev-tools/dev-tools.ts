@@ -7,9 +7,11 @@ class DevTools {
   private readonly _bottomSelect: HTMLSelectElement
   private readonly _reelSelect: HTMLSelectElement
   private readonly _rowSelect: HTMLSelectElement
+  private readonly _moveSelect: HTMLSelectElement
   private readonly _options: Array<string> = ['plum', 'grapes', 'bell', 'apple', 'coin', 'shoe', 'diamond', 'peach', 'random']
   private readonly _reelOptions: Array<string> = ['three', 'four', 'five', 'six', 'seven']
   private readonly _rowOptions: Array<string> = ['three', 'four']
+  private readonly _moveOptions: Array<string> = ['down', 'up']
   private _selectedOptions: Record<string, number> = {}
 
   constructor(appContainer: HTMLElement, callback: (options: Record<string, number>) => void) {
@@ -34,14 +36,22 @@ class DevTools {
     this._topCenterSelect = this._createSelect(this._options)
     this._centerSelect = this._createSelect(this._options)
     this._bottomSelect = this._createSelect(this._options)
+
     this._reelSelect = this._createSelect(this._reelOptions)
+    this._reelSelect.selectedIndex = 2
+
     this._rowSelect = this._createSelect(this._rowOptions)
+    this._rowSelect.selectedIndex = 0
+
+    this._moveSelect = this._createSelect(this._moveOptions)
+    this._moveSelect.selectedIndex = 0
 
     this._addSelectableGroup('Top', this._topCenterSelect)
     this._addSelectableGroup('Center', this._centerSelect)
     this._addSelectableGroup('Bottom', this._bottomSelect)
     this._addSelectableGroup('Reel', this._reelSelect)
     this._addSelectableGroup('Row', this._rowSelect)
+    this._addSelectableGroup('Move', this._moveSelect)
 
     this._selectContainer.appendChild(this._createSendButton(callback))
 
@@ -53,6 +63,7 @@ class DevTools {
     this._bottomSelect.addEventListener('change', this._handleSelectChange.bind(this, 'bottom'))
     this._reelSelect.addEventListener('change', this._handleSelectChange.bind(this, 'reel'))
     this._rowSelect.addEventListener('change', this._handleSelectChange.bind(this, 'row'))
+    this._moveSelect.addEventListener('change', this._handleSelectChange.bind(this, 'move'))
   }
 
   private _addSelectableGroup(label: string, select: HTMLSelectElement): void {
@@ -87,7 +98,7 @@ class DevTools {
   private _handleSelectChange(groupName: string, event: Event): void {
     const select = event.target as HTMLSelectElement
     let selectedOption = Number(select.value)
-    if(groupName === 'reel' || groupName === 'row'){
+    if (groupName === 'reel' || groupName === 'row') {
       selectedOption += 3
     }
     this._selectedOptions[groupName] = selectedOption

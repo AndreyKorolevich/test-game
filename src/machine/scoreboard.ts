@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js'
 import { config } from '../config'
 import SlotMachine from './slot-machine'
+import click from '../assets/audio/slide.mp3'
 
 class Scoreboard {
   public container: PIXI.Container = new PIXI.Container()
@@ -11,6 +12,7 @@ class Scoreboard {
   private _placeBetText: PIXI.Text | undefined
   private _decreaseBetText: PIXI.Text | undefined
   private readonly _slotMachine: SlotMachine
+  private readonly _sound: HTMLAudioElement = new Audio()
 
   public constructor(app: PIXI.Application, slotMachine: SlotMachine) {
     this._slotMachine = slotMachine
@@ -26,6 +28,7 @@ class Scoreboard {
 
     const balanceBcg = this._initializeBalanceBoard(appWidth, style, actionStyle, yPosition)
     const betBcg = this._initializeBetBoard(appWidth, style, actionStyle, yPosition)
+    this._sound.src = click
 
     this.container.addChild(balanceBcg, betBcg)
   }
@@ -65,7 +68,7 @@ class Scoreboard {
   private _initializeBetBoard(appWidth: number, style: PIXI.TextStyle, actionStyle: PIXI.TextStyle, yPosition: number): PIXI.Graphics {
     this._betText = new PIXI.Text(`Bet: ${this._slotMachine.getBet()}$`, style)
     this._betText.y = yPosition + this._betText.height / 2
-    this._betText.x = appWidth  - config.text.bcgWidth / 2 - this._betText.width / 2
+    this._betText.x = appWidth - config.text.bcgWidth / 2 - this._betText.width / 2
 
     this._placeBetText = new PIXI.Text('+', new PIXI.TextStyle(actionStyle))
     this._placeBetText.y = yPosition
@@ -95,10 +98,16 @@ class Scoreboard {
 
   public setBalance(balance: number): void {
     this._balanceText!.text = `Balance: ${balance}$`
+    this._playSound()
   }
 
   public setBet(bet: number): void {
     this._betText!.text = `Bet: ${bet}$`
+    this._playSound()
+  }
+
+  private _playSound(): void {
+    this._sound.play()
   }
 }
 

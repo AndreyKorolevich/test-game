@@ -14,6 +14,8 @@ import { HasBetState } from './slot-mashine-state/has-bet-state'
 import { WinState } from './slot-mashine-state/win-state'
 import { LostState } from './slot-mashine-state/lost-state'
 import { SpinReelsState } from './slot-mashine-state/spin-reels-state'
+import SpinDownStrategy from './reel-strategy/spin-down-strategy'
+import SpinUpStrategy from './reel-strategy/spin-up-strategy'
 
 export type AnimationT = {
   reel: Reel,
@@ -84,8 +86,11 @@ class SlotMachine {
     // Apply the mask to the reelsContainer
     reelsContainer.mask = maskShape
 
+    // create array of reels with certain movement strategy
     for (let i = 0; i < this._countReels; i++) {
-      const reel = new Reel(app, i, this.config)
+      //strategy can be change in devTools, by default is SpinDownStrategy
+      const strategy = this.config.dev.move ? new SpinUpStrategy() : new SpinDownStrategy()
+      const reel = new Reel(app, strategy, i, this.config)
       this.reels.push(reel)
       reelsContainer.addChild(reel.container)
     }
@@ -108,7 +113,7 @@ class SlotMachine {
       for (let i = 0; i < this._animations.length; i++) {
         const animation = this._animations[i]
         const stage = Math.min(1, (now - animation.start) / animation.delay)
-        animation.reel.spin(stage)
+        animation.reel.spin(stage, i)
 
         if (stage === 1) {
           // wait before the last reel is stopped
@@ -173,8 +178,8 @@ class SlotMachine {
 
     })
 
+    //if there is a match, size of Set will be 1, because Set save only unique name of texture
     for (const [combName, combSet] of combinations) {
-      console.log(combName, combSet)
       if (combSet.size === 1) return true
     }
 
