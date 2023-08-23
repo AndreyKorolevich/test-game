@@ -23,6 +23,7 @@ export const config = {
     isSpinning: false,
     additionalRightOffset: 15,
     height: 339,
+    target: 12
   },
 
   crank: {
@@ -65,7 +66,6 @@ export const config = {
   spin: {
     firstDelay: 2000,
     reelDelay: 500,
-    startOffset: 10
   },
 
   dev: {

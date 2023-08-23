@@ -5,46 +5,40 @@ class Reel {
   public readonly cells: Array<PIXI.Texture>
   private _ticker: PIXI.Ticker
   public position: number
-  private _previousPosition: number
   public sprites: Array<PIXI.Sprite> = []
   public blur = new PIXI.filters.BlurFilter()
   private readonly _width: number
+  // define how much visible elements on the reel
   private readonly _countRows: number
-  private readonly _getTargets: () => Set<number>
   private _config: { [key: string]: any }
+  // define how much exchanges will be in the reel on every spin
+  private readonly _target: number
 
   public constructor(
     app: PIXI.Application,
     position: number,
     config: { [key: string]: any },
-    getTargets: () => Set<number>,
   ) {
     this._ticker = app.ticker
     this.position = position
-    this._getTargets = getTargets
 
     this.cells = [
-      app.loader.resources.asset.textures!['cell1.png'],
-      app.loader.resources.asset.textures!['cell2.png'],
-      app.loader.resources.asset.textures!['cell3.png'],
-      app.loader.resources.asset.textures!['cell4.png'],
-      app.loader.resources.asset.textures!['cell5.png'],
-      app.loader.resources.asset.textures!['cell6.png'],
-      app.loader.resources.asset.textures!['cell7.png'],
-      app.loader.resources.asset.textures!['cell8.png'],
+      app.loader.resources.asset.textures!['plum.png'],
+      app.loader.resources.asset.textures!['grapes.png'],
+      app.loader.resources.asset.textures!['bell.png'],
+      app.loader.resources.asset.textures!['apple.png'],
+      app.loader.resources.asset.textures!['coin.png'],
+      app.loader.resources.asset.textures!['shoe.png'],
+      app.loader.resources.asset.textures!['diamond.png'],
+      app.loader.resources.asset.textures!['peach.png'],
     ]
     this._config = config
 
-    this._previousPosition = config.reel.previousPosition
     this._width = config.reel.width
     this._countRows = config.reel.countRows
+    this._target = config.reel.target
 
     this._initializeReel(position)
-  }
-
-  public spin(startPosition: number, target: number, easing: number): void {
-    this.position = this._lerp(startPosition, target, easing)
-    this.setBlur()
   }
 
   private _initializeReel(position: number): void {
@@ -56,62 +50,51 @@ class Reel {
     for (let i = 0; i < this._countRows + 1; i++) {
       const cell = new PIXI.Sprite(this.cells[Math.floor(Math.random() * this.cells.length)])
       cell.y = i * this._config.cell.width
-
       this.sprites.push(cell)
       this.container.addChild(cell)
     }
-
-    this._addTicker()
   }
 
-  private _addTicker(): void {
-    this._ticker.add((delta) => {
-      // Update the slots.
-      this._previousPosition = this.position
-      const targetPositions = this._getTargets()
+  // works on every tick of PIXI.ticker
+  public spin(stage: number): void {
+    this.position = this._target * this._fluctuation(stage)
 
-      // Update symbol positions on reel.
-      for (let j = 0; j < this.sprites.length; j++) {
-        const sprite = this.sprites[j]
-        const prevy = sprite.y
+    // Update positions of elements in reel
+    for (let i = 0; i < this.sprites.length; i++) {
+      const sprite = this.sprites[i]
+      const prev = sprite.y
+      sprite.y = ((this.position + i) % this.sprites.length) * this._config.cell.width - this._config.cell.width
 
-        sprite.y = ((this.position + j) % this.sprites.length) * this._config.cell.width - this._config.cell.width // TODO
+      if (sprite.y < 0 && prev > sprite.width) {
+        // Detect when element is going over and exchange a texture
 
-        if (sprite.y < 0 && prevy > this._config.cell.width) {
-          // Detect going over and swap a texture
-
-          // first 3 "if" use for test purposes
-          if (this._shouldSetTexture(this._config.dev.top, 1, targetPositions)) {
-            sprite.texture = this.cells[this._config.dev.top]
-          } else if (this._shouldSetTexture(this._config.dev.center, 2, targetPositions)) {
-            sprite.texture = this.cells[this._config.dev.center]
-          } else if (this._shouldSetTexture(this._config.dev.bottom, 3, targetPositions)) {
-            sprite.texture = this.cells[this._config.dev.bottom]
-          } else {
-            // regular swap texture
-            sprite.texture = this.cells[Math.floor(Math.random() * this.cells.length)]
-          }
-
-
+        // first 3 "if" use for test purposes with devTools
+        if (this._shouldSetTexture(this._config.dev.top, 1, this._target)) {
+          sprite.texture = this.cells[this._config.dev.top]
+        } else if (this._shouldSetTexture(this._config.dev.center, 2, this._target)) {
+          sprite.texture = this.cells[this._config.dev.center]
+        } else if (this._shouldSetTexture(this._config.dev.bottom, 3, this._target)) {
+          sprite.texture = this.cells[this._config.dev.bottom]
+        } else {
+          // regular swap texture
+          sprite.texture = this.cells[Math.floor(Math.random() * this.cells.length)]
         }
       }
-    })
+    }
   }
 
-  private _shouldSetTexture(settingsValue: number | undefined, offset: number, targetPositions: Set<number>): boolean {
+  // check if there is some dev tools settings
+  private _shouldSetTexture(settingsValue: number | undefined, offset: number, targetPosition: number): boolean {
     return (
       settingsValue !== undefined &&
-      settingsValue < this.cells.length - 1 &&
-      targetPositions.has(Math.floor(this.position) + offset)
+      settingsValue < this.cells.length &&
+      targetPosition === Math.floor(this.position) + offset
     )
   }
 
-  public setBlur(): void {
-    this.blur.blurY = (this.position - this._previousPosition) * 16
-  }
-
-  private _lerp(startPosition: number, target: number, easing: number): number {
-    return startPosition * (1 - easing) + target * easing
+  // add effect of when reel spin a little more than it need and then return to correct position
+  private _fluctuation(amount: number) {
+    return (--amount * amount * (1.5 * amount + 0.5) + 1)
   }
 
 }

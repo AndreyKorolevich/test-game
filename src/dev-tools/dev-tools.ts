@@ -7,10 +7,9 @@ class DevTools {
   private readonly _bottomSelect: HTMLSelectElement
   private readonly _reelSelect: HTMLSelectElement
   private readonly _rowSelect: HTMLSelectElement
-  private readonly _options: Array<string> = ['cell1', 'cell2', 'cell3', 'cell4', 'cell5', 'cell6', 'cell7', 'cell8', 'random']
+  private readonly _options: Array<string> = ['plum', 'grapes', 'bell', 'apple', 'coin', 'shoe', 'diamond', 'peach', 'random']
   private readonly _reelOptions: Array<string> = ['three', 'four', 'five', 'six', 'seven']
   private readonly _rowOptions: Array<string> = ['three', 'four']
-
   private _selectedOptions: Record<string, number> = {}
 
   constructor(appContainer: HTMLElement, callback: (options: Record<string, number>) => void) {

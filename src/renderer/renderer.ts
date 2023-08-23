@@ -2,7 +2,6 @@ import * as PIXI from 'pixi.js'
 import SlotMachine from '../machine/slot-machine'
 import Background from '../background/background'
 import Loader from '../loader/loader'
-import LoadingScreen from '../screen/loading-screen'
 import { config } from '../config'
 import DevTools from '../dev-tools/dev-tools'
 
@@ -11,9 +10,8 @@ class Renderer {
   private _slotMachine: SlotMachine | undefined
   private _background: Background | undefined
   private _loader: Loader
-  private readonly _loadingScreen: LoadingScreen
   private _devTools: DevTools
-  private _config: {[key: string]: any} = config
+  private _config: { [key: string]: any } = config
 
   public constructor() {
     const root = document.getElementById('root')
@@ -23,13 +21,12 @@ class Renderer {
       height: config.render.height + config.crank.bcgHeight,
       width: config.reel.width * config.slotMachine.countReels * config.reel.scale.x + (config.sideColumn.width * 2),
       transparent: true,
-      view: document.getElementById("game") as HTMLCanvasElement
+      view: document.getElementById('game') as HTMLCanvasElement,
     })
 
     document.body.appendChild(this._application.view)
 
-    this._loadingScreen = new LoadingScreen(this._application, () => {})
-    this._loader = new Loader(this._application, this._loadingScreen, this._start.bind(this))
+    this._loader = new Loader(this._application, this._start.bind(this))
   }
 
   private _start(): void {
@@ -39,7 +36,6 @@ class Renderer {
 
   private _initializeSlotMachine(): void {
     this._slotMachine = new SlotMachine(this._application, this._config)
-
     this._application.stage.addChild(this._slotMachine.container)
   }
 
@@ -48,7 +44,8 @@ class Renderer {
     this._application.stage.addChild(this._background.container)
   }
 
-  private _resizeScreen(): void{
+  // resize canvas to fit different screen resolutions
+  private _resizeScreen(): void {
     this._application.view.width = this._config.reel.width * this._config.slotMachine.countReels * this._config.reel.scale.x + (this._config.sideColumn.width * 2)
     this._application.screen.width = this._config.reel.width * this._config.slotMachine.countReels * this._config.reel.scale.x + (this._config.sideColumn.width * 2)
     this._application.view.height = this._config.cell.width * this._config.reel.countRows + this._config.crank.bcgHeight
@@ -56,7 +53,6 @@ class Renderer {
   }
 
   private _saveSettings(settings: { [key: string]: number }): void {
-    console.log(settings)
     // Remove existing SlotMachine instance
     if (this._slotMachine) {
       this._application.stage.removeChild(this._slotMachine.container)
@@ -74,17 +70,17 @@ class Renderer {
       ...this._config,
       slotMachine: {
         ...this._config.slotMachine,
-        countReels: settings.reel !== undefined ? settings.reel : this._config.slotMachine.countReels
+        countReels: settings.reel !== undefined ? settings.reel : this._config.slotMachine.countReels,
       },
       reel: {
         ...this._config.reel,
-        countRows: settings.row !== undefined ? settings.row : this._config.reel.countRows
+        countRows: settings.row !== undefined ? settings.row : this._config.reel.countRows,
       },
       dev: {
         top: settings.top,
         center: settings.center,
-        bottom: settings.bottom
-      }
+        bottom: settings.bottom,
+      },
     }
 
     this._resizeScreen()
