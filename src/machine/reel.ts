@@ -15,7 +15,7 @@ class Reel {
   private _config: { [key: string]: any }
   private readonly _moveStrategy: ReelStrategyI
   private readonly _sound: HTMLAudioElement = new Audio()
-  isPlayedFinishSound: boolean = false
+  private _isPlayedFinishSound: boolean = false
 
   public constructor(
     app: PIXI.Application,
@@ -66,13 +66,13 @@ class Reel {
     this.position = this._moveStrategy.calculateStep(stage)
 
     //play sound when reel is stopped
-    if (!this.isPlayedFinishSound && stage + (0.5 - order * 0.1) > 1) {
+    if (!this._isPlayedFinishSound && stage + (0.5 - order * 0.1) > 1) {
       this._playFinishSound()
-      this.isPlayedFinishSound = true
+      this._isPlayedFinishSound = true
     }
 
     if (stage === 1) {
-      this.isPlayedFinishSound = false
+      this._isPlayedFinishSound = false
     }
 
     // Update positions of elements in reel
