@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js'
 import ReelStrategyI from './reel-strategy/reel-strategy'
 import slide from '../assets/audio/end.mp3'
+import { calculateBlur } from '../utilities/logDecreaseFunction'
 
 class Reel {
   public readonly container = new PIXI.Container()
@@ -74,6 +75,8 @@ class Reel {
     if (stage === 1) {
       this._isPlayedFinishSound = false
     }
+
+    this.blur.blurY = calculateBlur(stage)
 
     // Update positions of elements in reel
     for (let i = 0; i < this.sprites.length; i++) {

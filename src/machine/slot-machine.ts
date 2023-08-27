@@ -162,7 +162,7 @@ class SlotMachine {
 
     //initialize the number of combinations equal to the number of rows in the slot machine
     for (let i = 0; i < this.config.reel.countRows; i++) {
-      combinations.set(`comb${i}`, new Set)
+      combinations.set(`comb${i}`, new Set())
     }
 
     //go through all the reels and look at the array of sprites to take the texture and put it in the combination object

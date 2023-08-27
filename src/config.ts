@@ -23,7 +23,7 @@ export const config = {
     isSpinning: false,
     additionalRightOffset: 15,
     height: 339,
-    target: 12
+    target: 16
   },
 
   crank: {
