@@ -1,7 +1,7 @@
-# Mahi Gaming: Game Dev Skills Assessment
-Deploy: https://golden-dieffenbachia-31d830.netlify.app/
+## Slot-Machine
+### Deploy: https://golden-dieffenbachia-31d830.netlify.app/
+### UML: https://docs.google.com/drawings/d/1IGjMHLpTIRtL_8_W04ZJwZQOyaKUX7m0vmzH-PeIiRA/edit
 
-### Slot-Machine
 Learning and developing programming skills is an integral part of a good specialist. In my opinion, game development is the best learning tool. It is in gamedev that one can meet the most complex algorithms, high performance requirements and non-standard tasks.
 
 The following technologies will be required during development: html, css, javascript, strategy and state design patterns, SPA application methodology, PIXI library.
@@ -34,26 +34,3 @@ game loop.\
 Scene recalculation on each iteration of the game loop.\
 Scene display after each recalculation.\
 Saving resources.
-## 3. Tasks
-
-### a. Slot Machine UML/Class Diagram/Flow Chart
-
-You are required to create a UML or equivalent Class Diagram with an accompanying Flow Chart for a slot game.
-
-### b. Slot Machine Implementation
-
-You are required to develop a slot game using programmatic motion for the spinning reels. There should be 5 reels, with 3 symbols visible on each reel.
-
-From a test perspective, you must provide a mechanism that allows reel targets to be set. When the reels are spun, it must stop at this predefined target.
-
-This must support responsive browsing. Your game canvas should fit to the screen at any resolution.
-
-## 4. Bonuses
-
-1. Add unit tests. Unit testing support has already been added to this project via jest.
-
-2. Support dynamic number of reels/rows.
-
-3. Support multiple directions of spinning reels.
-
-4. Any other clever ideas you may have to demonstrate your abilities.

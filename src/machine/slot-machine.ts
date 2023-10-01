@@ -94,7 +94,6 @@ class SlotMachine {
       this.reels.push(reel)
       reelsContainer.addChild(reel.container)
     }
-
     this.container.addChild(reelsContainer, this.crank.container, this._scoreboard.container)
 
     // add screens by the last to show them on top of other content
